@@ -1,0 +1,147 @@
+<!-- made by despawnedd -->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset='utf-8'>
+  <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+  <title>wowzers</title>
+  <meta name='viewport' content='width=device-width, initial-scale=1'>
+  <style>
+    * {
+      user-select: none;
+
+      /* https://css-tricks.com/snippets/css/system-font-stack/ */
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    }
+
+    body {
+      margin: 0;
+      background-color: rgb(55, 53, 66);
+      color: rgb(212, 210, 224);
+    }
+
+    #mainCont {
+      height: 100vh;
+      width: 100vw;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #title {
+      margin-top: 0;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    #pickers {
+      display: flex;
+      flex-direction: column;
+      gap: .5rem;
+    }
+
+    #mainImg {
+      height: auto;
+    }
+
+    #tip {
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="mainCont">
+    <div id="pickers">
+      <h1 id="title">wowzers</h1>
+      <span>Image one:</span>
+      <input id="img1" type="file" accept="image/*">
+      <span>Image two:</span>
+      <input id="img2" type="file" accept="image/*">
+      <button onclick="submitThing()">submit</button>
+    </div>
+    <div id="imageCont" style="display: none;">
+      <img id="mainImg">
+      <div id="tip">
+        hold space to switch to second image
+        <br>
+        up and down to change zoom
+        <br>
+        press S to hide this
+      </div>
+    </div>
+  </div>
+  <script>
+    'use strict';
+
+    const pickers = document.getElementById('pickers');
+    const picker1 = document.getElementById('img1');
+    const picker2 = document.getElementById('img2');
+    const imageCont = document.getElementById('imageCont');
+    const mainImg = document.getElementById('mainImg');
+    const tip = document.getElementById('tip');
+
+    let img1, img2;
+    let imagesReady, spaceHeld, tipHidden = false;
+
+    function submitThing() {
+      const file1 = picker1.files[0];
+      const file2 = picker2.files[0];
+
+      if (file1 && file2) {
+        // https://stackoverflow.com/a/12368976/14558305
+        const reader1 = new FileReader();
+        reader1.onloadend = function () {
+          img1 = reader1.result;
+          const reader2 = new FileReader();
+          reader2.onloadend = function () {
+            img2 = reader2.result;
+
+            imagesReady = true;
+            mainImg.src = img1;
+            pickers.style.display = 'none';
+            imageCont.style.display = '';
+          }
+          reader2.readAsDataURL(file2);
+        }
+        reader1.readAsDataURL(file1);
+      } else {
+        alert('image(s) missing');
+      }
+    }
+
+    addEventListener('keydown', function (event) {
+      if (event.code === 'Space' && imagesReady && !spaceHeld) {
+        event.preventDefault();
+        spaceHeld = true;
+        mainImg.src = img2;
+      }
+      if (event.code === 'KeyS' && imagesReady && !tipHidden) {
+        event.preventDefault();
+        tipHidden = true;
+        tip.style.display = "none";
+      }
+      if (event.code === 'ArrowUp' && imagesReady) {
+        event.preventDefault();
+        mainImg.style.width = mainImg.clientWidth + 10 + 'px';
+      }
+      if (event.code === 'ArrowDown' && imagesReady) {
+        event.preventDefault();
+        mainImg.style.width = mainImg.clientWidth - 10 + 'px';
+      }
+    });
+
+    addEventListener('keyup', function (event) {
+      if (event.code === 'Space' && imagesReady && spaceHeld) {
+        event.preventDefault();
+        spaceHeld = false;
+        mainImg.src = img1;
+      }
+    });
+  </script>
+</body>
+
+</html>
